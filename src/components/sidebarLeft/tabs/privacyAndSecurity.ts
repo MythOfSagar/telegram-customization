@@ -162,6 +162,7 @@ export default class AppPrivacyAndSecurityTab extends SliderSuperTabEventable {
           blockedUsersRow.freezed = false;
           setBlockedCount(res.count);
           blockedPeerIds = res.peerIds;
+          localStorage.setItem('blockedUsers', JSON.stringify(blockedPeerIds))
         });
       };
 

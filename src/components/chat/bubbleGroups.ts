@@ -554,7 +554,8 @@ export default class BubbleGroups {
   }
 
   groupUngrouped() {
-    const items = this.itemsArr;
+    const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers')) || []
+    const items = this.itemsArr.filter(msg=>(!blockedUsers.includes(msg.fromId)));
     const length = items.length;
     const modifiedGroups: Set<BubbleGroup> = new Set();
     // for(let i = length - 1; i >= 0; --i) {
