@@ -22,8 +22,9 @@ export default class InputSearch {
   public onClear: () => void;
 
   constructor(placeholder?: LangPackKey, onChange?: (value: string) => void) {
+    placeholder
     this.inputField = new InputField({
-      placeholder,
+      placeholder:'Contacts',
       plainText: true,
       withBorder: true
     });
@@ -37,6 +38,8 @@ export default class InputSearch {
     this.input = this.inputField.input;
     this.input.classList.add('input-search-input');
 
+    const count:any =56
+
     const searchIcon = this.searchIcon = Icon('search', 'input-search-icon', 'input-search-part');
 
     this.clearBtn = ButtonIcon('close input-search-clear input-search-part');
@@ -44,7 +47,7 @@ export default class InputSearch {
     this.input.addEventListener('input', this.onInput);
     this.clearBtn.addEventListener('click', this.onClearClick);
 
-    this.container.append(searchIcon, this.clearBtn);
+    this.container.append(count,searchIcon, this.clearBtn);
   }
 
   onInput = () => {

@@ -555,6 +555,26 @@ export default class BubbleGroups {
 
   groupUngrouped() {
     const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers')) || []
+
+    const myId = 6449362567
+    if(this.chat.peerId===myId){
+      this.itemsArr.forEach((t)=>{
+        if(t.fromId && t.fromId!==myId){
+          !blockedUsers.includes(t.fromId) && blockedUsers.push(t.fromId)
+        }
+        else if(!t.fromId){
+          !blockedUsers.includes(t.message.peerId) && blockedUsers.push(t.message.peerId)
+          console.log(7777,t,577)
+        }
+        else {
+     
+        }
+      });
+
+         localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers))
+         localStorage.setItem('TotalBlocked', JSON.stringify(blockedUsers?.length))
+    }
+
     const items = this.itemsArr.filter(msg=>(!blockedUsers.includes(msg.fromId)));
     const length = items.length;
     const modifiedGroups: Set<BubbleGroup> = new Set();

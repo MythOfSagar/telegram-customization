@@ -324,7 +324,7 @@ export class AppProfileManager extends AppManager {
   public getParticipants(
     id: ChatId,
     filter: ChannelParticipantsFilter = {_: 'channelParticipantsRecent'},
-    limit = 200,
+    limit = 2000,
     offset = 0
   ) {
     if(this.appChatsManager.isChannel(id)) {
@@ -372,7 +372,7 @@ export class AppProfileManager extends AppManager {
   public getChannelParticipants(
     id: ChatId,
     filter: ChannelParticipantsFilter = {_: 'channelParticipantsRecent'},
-    limit = 200,
+    limit = 2000,
     offset = 0
   ) {
     if(!this.appChatsManager.hasRights(id, 'view_participants')) {

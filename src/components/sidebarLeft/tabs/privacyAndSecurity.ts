@@ -41,7 +41,6 @@ import PopupPremium from '../../popups/premium';
 export default class AppPrivacyAndSecurityTab extends SliderSuperTabEventable {
   private activeSessionsRow: Row;
   private authorizations: Authorization.authorization[];
-
   private websitesRow: Row;
   private websites: WebAuthorization[];
 
@@ -158,13 +157,15 @@ export default class AppPrivacyAndSecurityTab extends SliderSuperTabEventable {
       });
 
       const updateBlocked = () => {
+    
         this.managers.appUsersManager.getBlocked().then((res) => {
           blockedUsersRow.freezed = false;
           setBlockedCount(res.count);
           blockedPeerIds = res.peerIds;
-          localStorage.setItem('blockedUsers', JSON.stringify(blockedPeerIds))
         });
       };
+
+     
 
       updateBlocked();
 
@@ -504,6 +505,7 @@ export default class AppPrivacyAndSecurityTab extends SliderSuperTabEventable {
       _i18n(this.activeSessionsRow.subtitle, 'Privacy.Devices', [this.authorizations.length]);
     });
   }
+
 
   public updateActiveWebsites(promise = this.managers.appSeamlessLoginManager.getWebAuthorizations()) {
     return promise.then((authorizations) => {

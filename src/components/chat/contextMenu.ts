@@ -576,6 +576,7 @@ export default class ChatContextMenu {
       icon: 'flag',
       text: 'ReportChat',
       onClick: () => {
+
         PopupElement.createPopup(PopupReportMessages, this.peerId, [this.mid]);
       },
       verify: () => !this.message.pFlags.out && this.message._ === 'message' && !this.message.pFlags.is_outgoing && this.managers.appPeersManager.isChannel(this.peerId),
@@ -993,7 +994,6 @@ export default class ChatContextMenu {
       else if(threadId) url += `/${getServerMessageId(threadId)}/${msgId}`;
       else url += '/' + msgId;
     }
-
     return {url, isPrivate: !username};
   }
 
@@ -1084,7 +1084,9 @@ export default class ChatContextMenu {
       PopupForward.create({
         [peerId]: mids
       });
+
     }
+
   };
 
   private onSelectClick = () => {

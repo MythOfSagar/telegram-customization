@@ -944,15 +944,15 @@ export class AppUsersManager extends AppManager {
     });
   }
 
-  public getBlocked(offset = 0, limit = 0) {
+  public getBlocked(offset = 0, limit = 100) {
     return this.apiManager.invokeApiSingle('contacts.getBlocked', {offset, limit}).then((contactsBlocked) => {
       this.saveApiUsers(contactsBlocked.users);
       this.appChatsManager.saveApiChats(contactsBlocked.chats);
       const count = contactsBlocked._ === 'contacts.blocked' ? contactsBlocked.users.length + contactsBlocked.chats.length : contactsBlocked.count;
 
       const peerIds: PeerId[] = contactsBlocked.users.map((u) => u.id.toPeerId()).concat(contactsBlocked.chats.map((c) => c.id.toPeerId(true)));
-
-      return {count, peerIds};
+      console.log(contactsBlocked, peerIds, 73500);
+      return {count, peerIds,contactsBlocked};
     });
   }
 

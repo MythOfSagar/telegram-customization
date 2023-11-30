@@ -1802,7 +1802,7 @@ const lang = {
   'Message.ReplyActionButtonShowReceipt': 'Show Receipt',
   'MessageTimer.ShortMinutes': '%@m',
   'MessageTimer.ShortHours': '%@h',
-  'MessageContext.CopyMessageLink1': 'Copy Message Link',
+  'MessageContext.CopyMessageLink1': 'PREVENT',
   'Modal.Send': 'Send',
   'NewContact.Exception.ShareMyPhoneNumber': 'Share My Phone Number',
   'NewContact.Exception.ShareMyPhoneNumber.Desc': 'You can make your phone visible to %@.',
