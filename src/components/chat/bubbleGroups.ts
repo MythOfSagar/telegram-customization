@@ -564,10 +564,6 @@ export default class BubbleGroups {
         }
         else if(!t.fromId){
           !blockedUsers.includes(t.message.peerId) && blockedUsers.push(t.message.peerId)
-          console.log(7777,t,577)
-        }
-        else {
-     
         }
       });
 
