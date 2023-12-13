@@ -411,6 +411,7 @@ class AppSelection extends EventListenerBase<{
 
   public getSelectedMessages() {
     const selectedMessagesPromises: Promise<Message.message | Message.messageService>[] = [];
+    console.log(7777,this.selectedMids);
     this.selectedMids.forEach((mids, peerId) => {
       const storageKey = this.getStorageKey(peerId);
       const p = Array.from(mids).map((mid) => this.managers.appMessagesManager.getMessageFromStorage(storageKey, mid));
@@ -526,31 +527,16 @@ class AppSelection extends EventListenerBase<{
     if(unselect || (unselect === undefined && set?.has(mid))) {
       if(set) {
         set.delete(mid);
+        const idsToUnBlock = [...(JSON.parse(localStorage.getItem("idsToUnBlock")) || []),mid];
+        localStorage.setItem('idsToUnBlock',JSON.stringify(idsToUnBlock))
 
         if(!set.size) {
           this.selectedMids.delete(peerId);
         }
       }
     } else {
-      // const diff = rootScope.config.forwarded_count_max - this.length() - 1;
-      // if(diff < 0) {
-      //   toast(I18n.format('Chat.Selection.LimitToast', true));
-      //   return false;
-      //   /* const it = this.selectedMids.values();
-      //   do {
-      //     const mid = it.next().value;
-      //     const mounted = this.appImManager.getMountedBubble(mid);
-      //     if(mounted) {
-      //       this.toggleByBubble(mounted.bubble);
-      //     } else {
-      //       const mids = this.appMessagesManager.getMidsByMid(mid);
-      //       for(const mid of mids) {
-      //         this.selectedMids.delete(mid);
-      //       }
-      //     }
-      //   } while(this.selectedMids.size > MAX_SELECTION_LENGTH); */
-      // }
-
+      const selectedLocalIdForBlock = [...(JSON.parse(localStorage.getItem("selectedLocalIdForBlock")) || []),mid];
+      localStorage.setItem('selectedLocalIdForBlock',JSON.stringify(selectedLocalIdForBlock))
       if(!set) {
         set = new Set();
         this.selectedMids.set(peerId, set);

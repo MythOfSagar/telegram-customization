@@ -920,6 +920,7 @@ export default class AppSelectPeers {
 
       if(this.multiSelect) {
         const selected = this.selected.has(peerId);
+        console.log(7777,selected);
         dom.containerEl.prepend(this.checkbox(selected));
       }
 

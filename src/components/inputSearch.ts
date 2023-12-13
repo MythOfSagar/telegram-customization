@@ -38,7 +38,8 @@ export default class InputSearch {
     this.input = this.inputField.input;
     this.input.classList.add('input-search-input');
 
-    const count:any = JSON.parse(localStorage.getItem('TotalBlocked')) || 0
+    const cLocal = localStorage.getItem('TotalBlocked')
+    const count:any = cLocal ? +(cLocal) : 0
 
 
     const searchIcon = this.searchIcon = Icon('search', 'input-search-icon', 'input-search-part');

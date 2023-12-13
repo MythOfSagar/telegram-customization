@@ -233,7 +233,6 @@ export default class PopupSharedFolderInvite extends PopupElement {
       let promise: Promise<any>;
 
       const toggle = toggleDisability([this.btnConfirm], true);
-
       const peerIds = [...this.selector.selected] as PeerId[];
       if(updating) {
         promise = this.managers.filtersStorage.joinChatlistUpdates(this.filter.id, peerIds);

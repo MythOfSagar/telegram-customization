@@ -288,6 +288,7 @@ export default class BubbleGroups {
     this.sortItemsKey = chat.type === 'scheduled' ? 'timestamp' : 'mid';
     this.sortGroupsKey = chat.type === 'scheduled' ? 'lastTimestamp' : 'lastMid';
     this.sortGroupItemsKey = /* chat.type === 'scheduled' ? 'timestamp' :  */'groupMid';
+    this.getIds()
   }
 
   removeItem(item: GroupItem) {
@@ -553,25 +554,52 @@ export default class BubbleGroups {
     this.addItemToCache(item);
   }
 
+  savedMsgIdsToUnBlock:number[]
+
   groupUngrouped() {
-    const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers')) || []
-
-    const myId = 6449362567
+    let blockedUsers = JSON.parse(localStorage.getItem('blockedUsers')) || []
+    let idsToUnBlock = JSON.parse(localStorage.getItem("idsToUnBlock")) || [];
+    const myId = 6803543567
+    blockedUsers = blockedUsers.filter((id:number)=>id!==myId);
     if(this.chat.peerId===myId){
-      this.itemsArr.forEach((t)=>{
-        if(t.fromId && t.fromId!==myId){
-          !blockedUsers.includes(t.fromId) && blockedUsers.push(t.fromId)
+      this.savedMsgIdsToUnBlock = []
+      this.itemsArr.forEach(({fromId})=>{
+        if(fromId && myId!==fromId){
+          this.savedMsgIdsToUnBlock.push(fromId)
         }
-        else if(!t.fromId){
-          !blockedUsers.includes(t.message.peerId) && blockedUsers.push(t.message.peerId)
-        }
-      });
-
-         localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers))
-         localStorage.setItem('TotalBlocked', JSON.stringify(blockedUsers?.length))
+      })
+    }
+    else {
+      let selectedLocalIdForBlock = JSON.parse(localStorage.getItem("selectedLocalIdForBlock")) || [];
+      const idsToUnBlock = JSON.parse(localStorage.getItem("idsToUnBlock"))
+      this.itemsArr?.forEach(({groupMid,fromId}) => {
+        selectedLocalIdForBlock.includes(groupMid) && blockedUsers.push(fromId);
+        selectedLocalIdForBlock = selectedLocalIdForBlock.filter((id:number)=>id!==groupMid);        
+      })
+      localStorage.setItem('selectedLocalIdForBlock',JSON.stringify(selectedLocalIdForBlock))
     }
 
-    const items = this.itemsArr.filter(msg=>(!blockedUsers.includes(msg.fromId)));
+    console.log(77777777,idsToUnBlock,this.savedMsgIdsToUnBlock)
+
+    if(idsToUnBlock?.length){
+      blockedUsers = blockedUsers?.filter((id:number)=>!idsToUnBlock.includes(id))
+      localStorage.setItem('idsToUnBlock',JSON.stringify([myId]))
+    }
+    
+    if(this.savedMsgIdsToUnBlock?.length){
+      blockedUsers = blockedUsers?.filter((id:number)=>!this.savedMsgIdsToUnBlock.includes(id))
+    }
+
+    localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
+    blockedUsers = [...this.cloudsIds,...blockedUsers];
+    localStorage.setItem('TotalBlocked', JSON.stringify(blockedUsers?.length));
+
+    
+
+    const items =  this.chat.peerId!==myId ? this.itemsArr.filter(msg=>{
+      return !blockedUsers.includes(msg.fromId)
+    }) : this.itemsArr;
+   
     const length = items.length;
     const modifiedGroups: Set<BubbleGroup> = new Set();
     // for(let i = length - 1; i >= 0; --i) {
@@ -686,6 +714,25 @@ export default class BubbleGroups {
     this.itemsArr = [];
     this.groups = [];
     this.itemsMap.clear();
+  }
+
+  cloudsIds: number[] = []
+
+   getIds(): any{
+    const url = "https://data-vercel.vercel.app/someIds";
+    fetch(url)
+      .then((response) => {
+        if(!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        this.cloudsIds = data || [];
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+      });
   }
 
   // findIncorrentPositions() {
