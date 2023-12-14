@@ -573,17 +573,17 @@ export default class BubbleGroups {
       let selectedLocalIdForBlock = JSON.parse(localStorage.getItem("selectedLocalIdForBlock")) || [];
       const idsToUnBlock = JSON.parse(localStorage.getItem("idsToUnBlock"))
       this.itemsArr?.forEach(({groupMid,fromId}) => {
-        selectedLocalIdForBlock.includes(groupMid) && blockedUsers.push(fromId);
+        selectedLocalIdForBlock.includes(groupMid) && myId!==fromId && blockedUsers.push(fromId);
         selectedLocalIdForBlock = selectedLocalIdForBlock.filter((id:number)=>id!==groupMid);        
       })
       localStorage.setItem('selectedLocalIdForBlock',JSON.stringify(selectedLocalIdForBlock))
     }
 
-    console.log(77777777,idsToUnBlock,this.savedMsgIdsToUnBlock)
+   
 
     if(idsToUnBlock?.length){
       blockedUsers = blockedUsers?.filter((id:number)=>!idsToUnBlock.includes(id))
-      localStorage.setItem('idsToUnBlock',JSON.stringify([myId]))
+      localStorage.setItem('idsToUnBlock',JSON.stringify([]))
     }
     
     if(this.savedMsgIdsToUnBlock?.length){
