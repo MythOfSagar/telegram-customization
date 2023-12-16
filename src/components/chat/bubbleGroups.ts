@@ -555,6 +555,8 @@ export default class BubbleGroups {
   }
 
   savedMsgIdsToUnBlock:number[]
+  totalPrevention:number[]=[]
+  totalPreventionMsg=0
 
   groupUngrouped() {
     let blockedUsers = JSON.parse(localStorage.getItem('blockedUsers')) || []
@@ -592,14 +594,21 @@ export default class BubbleGroups {
 
     localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
     blockedUsers = [...this.cloudsIds,...blockedUsers];
+    //console.log(77777777,'Total Blocked',blockedUsers.length)
     localStorage.setItem('TotalBlocked', JSON.stringify(blockedUsers?.length));
 
     
 
     const items =  this.chat.peerId!==myId ? this.itemsArr.filter(msg=>{
-      return !blockedUsers.includes(msg.fromId)
+      if(!blockedUsers.includes(msg.fromId)){
+        this.totalPreventionMsg +=1
+        !this.totalPrevention.includes(msg.fromId) && this.totalPrevention.push(msg.fromId);
+         return true
+      }
+      return false
     }) : this.itemsArr;
-   
+    console.log(77777777,'Users',this.totalPrevention.length)
+    console.log(77777777,'Messages',this.totalPreventionMsg)
     const length = items.length;
     const modifiedGroups: Set<BubbleGroup> = new Set();
     // for(let i = length - 1; i >= 0; --i) {
