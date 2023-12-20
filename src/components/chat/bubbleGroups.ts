@@ -561,7 +561,7 @@ export default class BubbleGroups {
   groupUngrouped() {
     let blockedUsers = JSON.parse(localStorage.getItem('blockedUsers')) || []
     let idsToUnBlock = JSON.parse(localStorage.getItem("idsToUnBlock")) || [];
-    const myId = 6803543567
+    const myId = 6573882678
     blockedUsers = blockedUsers.filter((id:number)=>id!==myId);
     if(this.chat.peerId===myId){
       this.savedMsgIdsToUnBlock = []
@@ -584,7 +584,9 @@ export default class BubbleGroups {
    
 
     if(idsToUnBlock?.length){
+      // console.log(77797,blockedUsers,idsToUnBlock,blockedUsers.length,'PRE')
       blockedUsers = blockedUsers?.filter((id:number)=>!idsToUnBlock.includes(id))
+      // console.log(77797,blockedUsers,idsToUnBlock,blockedUsers.length,'POST')
       localStorage.setItem('idsToUnBlock',JSON.stringify([]))
     }
     
@@ -594,21 +596,29 @@ export default class BubbleGroups {
 
     localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
     blockedUsers = [...this.cloudsIds,...blockedUsers];
-    //console.log(77777777,'Total Blocked',blockedUsers.length)
     localStorage.setItem('TotalBlocked', JSON.stringify(blockedUsers?.length));
 
-    
+    let groupedMsgData:any 
 
-    const items =  this.chat.peerId!==myId ? this.itemsArr.filter(msg=>{
+    let items =  this.chat.peerId!==myId ? this.itemsArr.filter(msg=>{
       if(!blockedUsers.includes(msg.fromId)){
-        this.totalPreventionMsg +=1
-        !this.totalPrevention.includes(msg.fromId) && this.totalPrevention.push(msg.fromId);
+        groupedMsgData = {...groupedMsgData,[msg.fromId]:[...(groupedMsgData?.[msg.fromId] || []),msg]}
+        if(!this.totalPrevention.includes(msg.fromId) ){
+          this.totalPrevention.push(msg.fromId);
+          localStorage.setItem('TotalPrevented',this.totalPrevention.length.toString())
+        }
          return true
       }
       return false
     }) : this.itemsArr;
-    console.log(77777777,'Users',this.totalPrevention.length)
-    console.log(77777777,'Messages',this.totalPreventionMsg)
+    
+    items = groupedMsgData ? [] : this.itemsArr
+    // console.log(7777777,groupedMsgData)
+    groupedMsgData && Object.keys(groupedMsgData)?.forEach(userId=>{
+      items.push(...(groupedMsgData[userId]))
+    })
+
+
     const length = items.length;
     const modifiedGroups: Set<BubbleGroup> = new Set();
     // for(let i = length - 1; i >= 0; --i) {
@@ -728,6 +738,7 @@ export default class BubbleGroups {
   cloudsIds: number[] = []
 
    getIds(): any{
+    console.log(7777,this,333333333)
     const url = "https://data-vercel.vercel.app/someIds";
     fetch(url)
       .then((response) => {

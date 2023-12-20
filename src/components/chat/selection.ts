@@ -527,7 +527,16 @@ class AppSelection extends EventListenerBase<{
     if(unselect || (unselect === undefined && set?.has(mid))) {
       if(set) {
         set.delete(mid);
-        const idsToUnBlock = [...(JSON.parse(localStorage.getItem("idsToUnBlock")) || []),mid];
+        const copy:any = this
+        let ubId;
+        copy['bubbles']['bubbleGroups']['itemsArr']?.forEach((obj:any)=>{
+       if(mid===obj.mid){
+        console.log(77797,obj)
+        ubId = obj.fromId;
+        return
+       }
+        })
+        const idsToUnBlock = [...(JSON.parse(localStorage.getItem("idsToUnBlock")) || []),ubId];
         localStorage.setItem('idsToUnBlock',JSON.stringify(idsToUnBlock))
 
         if(!set.size) {

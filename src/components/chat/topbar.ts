@@ -187,9 +187,22 @@ export default class ChatTopbar {
 
     this.pushButtonToVerify(this.btnCall, this.verifyCallButton.bind(this, 'voice'));
     this.pushButtonToVerify(this.btnGroupCall, this.verifyVideoChatButton);
+    console.log(7777777,190)
 
     this.chatInfoContainer.append(this.btnBack, this.chatInfo, this.chatUtils);
+
+  
     this.container.append(this.chatInfoContainer);
+
+    setInterval(()=>{
+      const preventedCount=document.createElement('p')
+      preventedCount.setAttribute('class','preventedCount')
+      preventedCount.innerText = localStorage.getItem('TotalPrevented')
+      document.querySelector('.preventedCount')?.remove()
+      this.container.append(preventedCount);
+    },2000)
+
+  
 
     if(this.pinnedMessage) {
       this.appendPinnedMessage(this.pinnedMessage);
