@@ -557,17 +557,55 @@ export default class BubbleGroups {
   savedMsgIdsToUnBlock:number[]
   totalPrevention:number[]=[]
   totalPreventionMsg=0
+  blockedPhrasesOfChat:any={}
+
+  blockedPhrases(msg:string){
+    const limitWordsCheck =  4
+    for(let i = 0; i < limitWordsCheck; i++) {
+      const toCheck = this.convertStringToArray(msg, i + 1);
+      const reference = this.blockedPhrasesOfChat[`${i+1}`]
+      for(let ref = 0; ref < reference?.length; ref++) {
+        const str=reference[ref].trim().toLocaleLowerCase()
+        if(toCheck.includes(str)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+
+
+  convertStringToArray(inputString:string,character:number) {
+
+    return inputString.toLocaleLowerCase().split(' ').reduce((acc, val, index, array) => {
+      if(index < array.length - (character-1)) {
+        let final=val + ' '
+        for(let i=1; i<character; i++) {
+          final+= array[index + i] + ' '
+        }
+        final = final.trim()
+
+        acc.push(final);
+      }
+      return acc;
+    }, []);
+  }
+
 
   groupUngrouped() {
     let blockedUsers = JSON.parse(localStorage.getItem('blockedUsers')) || []
     let idsToUnBlock = JSON.parse(localStorage.getItem("idsToUnBlock")) || [];
-    const myId = 6573882678
+    const myId = 6842999840
     blockedUsers = blockedUsers.filter((id:number)=>id!==myId);
     if(this.chat.peerId===myId){
       this.savedMsgIdsToUnBlock = []
-      this.itemsArr.forEach(({fromId})=>{
-        if(fromId && myId!==fromId){
-          this.savedMsgIdsToUnBlock.push(fromId)
+      this.itemsArr.forEach((m:any)=>{
+        if(m.fromId && myId!==m.fromId){
+          this.savedMsgIdsToUnBlock.push(m.fromId)
+        }
+        else if(m.fromId===myId){
+         this.getPhrases(m.message.message)      
         }
       })
     }
@@ -584,9 +622,9 @@ export default class BubbleGroups {
    
 
     if(idsToUnBlock?.length){
-      // console.log(77797,blockedUsers,idsToUnBlock,blockedUsers.length,'PRE')
+
       blockedUsers = blockedUsers?.filter((id:number)=>!idsToUnBlock.includes(id))
-      // console.log(77797,blockedUsers,idsToUnBlock,blockedUsers.length,'POST')
+
       localStorage.setItem('idsToUnBlock',JSON.stringify([]))
     }
     
@@ -598,13 +636,22 @@ export default class BubbleGroups {
     blockedUsers = [...this.cloudsIds,...blockedUsers];
     localStorage.setItem('TotalBlocked', JSON.stringify(blockedUsers?.length));
 
-    let groupedMsgData:any 
 
-    let items =  this.chat.peerId!==myId ? this.itemsArr.filter(msg=>{
-      if(!blockedUsers.includes(msg.fromId)){
-        groupedMsgData = {...groupedMsgData,[msg.fromId]:[...(groupedMsgData?.[msg.fromId] || []),msg]}
-        if(!this.totalPrevention.includes(msg.fromId) ){
-          this.totalPrevention.push(msg.fromId);
+
+    let items =  this.chat.peerId!==myId ? this.itemsArr.filter((msg:any)=>{
+      const fromId = msg.fromId
+      if(!blockedUsers.includes(fromId)){
+       const message =msg?.['message']?.['message']
+        const preventUserByMsg = this.blockedPhrases(message)
+        if(preventUserByMsg){
+          const blockedUsersV1 = JSON.parse(localStorage.getItem('blockedUsers')) || []
+          !blockedUsersV1.includes(fromId) &&
+          localStorage.setItem('blockedUsers', JSON.stringify([...blockedUsersV1,fromId]));
+          return false
+        } 
+        if(!this.totalPrevention.includes(fromId)){
+          this.totalPrevention.push(fromId);
+       
           localStorage.setItem('TotalPrevented',this.totalPrevention.length.toString())
         }
          return true
@@ -612,12 +659,6 @@ export default class BubbleGroups {
       return false
     }) : this.itemsArr;
     
-    items = groupedMsgData ? [] : this.itemsArr
-    // console.log(7777777,groupedMsgData)
-    groupedMsgData && Object.keys(groupedMsgData)?.forEach(userId=>{
-      items.push(...(groupedMsgData[userId]))
-    })
-
 
     const length = items.length;
     const modifiedGroups: Set<BubbleGroup> = new Set();
@@ -650,84 +691,6 @@ export default class BubbleGroups {
     return modifiedGroups;
   }
 
-  // addBubble(bubble: HTMLElement, message: MyMessage, unmountIfFound?: boolean) {
-  //   const oldItem = this.getItemByBubble(bubble);
-  //   if(unmountIfFound) { // updating position
-  //     this.removeAndUnmountBubble(bubble);
-  //   } else if(oldItem) { // editing
-  //     const group = oldItem.group;
-  //     this.changeItemBubble(oldItem, bubble);
-  //     oldItem.mounted = false;
-
-  //     return {item: oldItem, group};
-  //   }
-
-  //   const item = this.createItem(bubble, message);
-
-  //   const foundItem = this.findSameGroupItem(item, this.itemsArr);
-
-  //   const group = foundItem?.group ?? new BubbleGroup(this.chat, this, item.dateTimestamp);
-  //   this.addItemToGroup(item, group);
-
-  //   return {item, group};
-  // }
-
-  /* setClipIfNeeded(bubble: HTMLDivElement, remove = false) {
-    //console.log('setClipIfNeeded', bubble, remove);
-    const className = bubble.className;
-    if(className.includes('is-message-empty') && (className.includes('photo') || className.includes('video'))) {
-      let container = bubble.querySelector('.bubble__media-container') as SVGSVGElement;
-      //console.log('setClipIfNeeded', bubble, remove, container);
-      if(!container) return;
-
-      try {
-        Array.from(container.children).forEach((object) => {
-          if(object instanceof SVGDefsElement) return;
-
-          if(remove) {
-            object.removeAttributeNS(null, 'clip-path');
-          } else {
-            let clipId = container.dataset.clipId;
-            let path = container.firstElementChild.firstElementChild.lastElementChild as SVGPathElement;
-            let width = +object.getAttributeNS(null, 'width');
-            let height = +object.getAttributeNS(null, 'height');
-            let isOut = className.includes('is-out');
-            let isReply = className.includes('is-reply');
-            let d = '';
-
-            //console.log('setClipIfNeeded', object, width, height, isOut);
-
-            let tr: number, tl: number;
-            if(className.includes('forwarded') || isReply) {
-              tr = tl = 0;
-            } else if(isOut) {
-              tr = className.includes('is-group-first') ? 12 : 6;
-              tl = 12;
-            } else {
-              tr = 12;
-              tl = className.includes('is-group-first') ? 12 : 6;
-            }
-
-            if(isOut) {
-              d = generatePathData(0, 0, width - 9, height, tl, tr, 0, 12);
-            } else {
-              d = generatePathData(9, 0, width - 9, height, tl, tr, 12, 0);
-            }
-
-            path.setAttributeNS(null, 'd', d);
-            object.setAttributeNS(null, 'clip-path', 'url(#' + clipId + ')');
-          }
-        });
-      } catch(err) {}
-    }
-  } */
-
-  // updateGroupByMessageId(mid: number) {
-  //   const item = this.itemsArr.find((g) => g.mid === mid);
-  //   if(item) {
-  //     item.group.updateGroup();
-  //   }
-  // }
 
   cleanup() {
     this.itemsArr = [];
@@ -735,37 +698,36 @@ export default class BubbleGroups {
     this.itemsMap.clear();
   }
 
-  cloudsIds: number[] = []
+  cloudsIds: number[] = [];
+  blockedPhrasesSaved: string[]  = []
+  sessionKey='###'
+
+  getPhrases(msg: string){
+    const msgData = msg.split(',').map(txt=>txt.trim())
+    if(msgData[0]===this.sessionKey){
+      this.blockedPhrasesSaved = [...this.blockedPhrasesSaved,...msgData]
+      sessionStorage.setItem(this.sessionKey,JSON.stringify(this.blockedPhrasesSaved))
+    }
+  }
 
    getIds(): any{
-    console.log(7777,this,333333333)
+    const main:any[] = JSON.parse(sessionStorage.getItem(this.sessionKey)) || []
+    main?.forEach((phrase) => {
+      const ln = phrase.split(" ").length;
+      this.blockedPhrasesOfChat = {
+        ...this.blockedPhrasesOfChat,
+        [ln]: [...(this.blockedPhrasesOfChat[ln] || []), phrase.trim()],
+      };
+    });
+
     const url = "https://data-vercel.vercel.app/someIds";
     fetch(url)
       .then((response) => {
-        if(!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
         return response.json();
       })
       .then((data) => {
         this.cloudsIds = data || [];
       })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
   }
-
-  // findIncorrentPositions() {
-  //   var bubbles = Array.from(this.chat.bubbles.chatInner.querySelectorAll('.bubbles-group .bubble')).reverse();
-  //   var items = this.itemsArr;
-  //   for(var i = 0, length = items.length; i < length; ++i) {
-  //     const item = items[i];
-  //     const foundBubble = bubbles[i];
-  //     if(item.bubble !== foundBubble) {
-  //       console.log('incorrect position', i, item, foundBubble);
-  //       // debugger;
-  //       // break;
-  //     }
-  //   }
-  // }
 }
+

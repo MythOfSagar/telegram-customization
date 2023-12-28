@@ -187,7 +187,6 @@ export default class ChatTopbar {
 
     this.pushButtonToVerify(this.btnCall, this.verifyCallButton.bind(this, 'voice'));
     this.pushButtonToVerify(this.btnGroupCall, this.verifyVideoChatButton);
-    console.log(7777777,190)
 
     this.chatInfoContainer.append(this.btnBack, this.chatInfo, this.chatUtils);
 

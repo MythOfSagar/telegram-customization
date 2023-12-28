@@ -1513,7 +1513,6 @@ export default class ChatInput {
 
   public getCurrentInputAsDraft(ignoreEmptyValue?: boolean) {
     const {value, entities} = getRichValueWithCaret(this.messageInputField.input, true, false);
-   console.log(7777,JSON.parse(localStorage.getItem('TotalBlocked')),'getRichValueWithCaret')
     let draft: DraftMessage.draftMessage;
     if((value.length || ignoreEmptyValue) || this.replyToMsgId || this.willSendWebPage) {
       const webPage = this.willSendWebPage as WebPage.webPage;
@@ -2044,7 +2043,6 @@ export default class ChatInput {
       oldInputField.input.replaceWith(this.messageInputField.input);
       oldInputField.inputFake.replaceWith(this.messageInputField.inputFake);
     } else {
-      console.log(77777,'oldInputField')
       this.inputMessageContainer.append(this.messageInputField.input, this.messageInputField.inputFake);
     }
   }
